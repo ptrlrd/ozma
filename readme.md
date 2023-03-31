@@ -1,4 +1,4 @@
-<p align="center"><img src="ozma.png" /></p>
+<p align="center" width="150" height="150"><img src="ozma.png" /></p>
 <h1 align="center">Ozma</h1>
 <h2 align="center">The Role Management and FFXIV Lookup Bot for Dawntreaders</h2>
 
