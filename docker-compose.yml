@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: ${DOCKER_IMAGE_NAME}
+    image: ${DOCKERHUB_USERNAME}/${DOCKER_IMAGE_NAME}:latest
+    environment:
+      - token=${token}
+      - guild_id=${guild_id}
+    restart: always
