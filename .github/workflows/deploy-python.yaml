@@ -23,11 +23,11 @@ jobs:
           pip install flake8
 
       - name: Run Flake8 with Reviewdog
-        uses: reviewdog/action-flake8@v2
+        uses: reviewdog/action-flake8@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-check
-          flake8_args: --config=setup.cfg
+          args: --config=setup.cfg
           level: warning
 
   deploy:
