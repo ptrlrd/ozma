@@ -80,7 +80,7 @@ class MyClient(discord.Client):
                 message_id_store = json.load(f)
                 print(
                     f"Loaded message_id_store: {message_id_store}")
-                    # Add this line
+                        # Add this line
                 return message_id_store
         return {}
 
@@ -342,8 +342,8 @@ async def get_text_channels(guild: discord.Guild) -> List[discord.TextChannel]:
 
 
 async def send_error_message(interaction: discord.Interaction, error):
-    error_channel_id = os.environ["error_channel_id"]
-    #error_channel = client.get_channel(error_channel_id)
+    # error_channel_id = os.environ["error_channel_id"]
+    # error_channel = client.get_channel(error_channel_id)
 
     print(error)
 
