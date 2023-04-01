@@ -271,6 +271,13 @@ class ChannelsView(discord.ui.View):
 
 
 # 4. Define functions
+
+def is_hex(value: str) -> bool:
+    try:
+        int(value, 16)
+        return True
+    except ValueError:
+        return False
 def is_valid_image_url(url: str) -> bool:
     allowed_extensions = ('.jpg', '.jpeg', '.png', '.gif')
     return url.lower().endswith(allowed_extensions)
@@ -449,10 +456,10 @@ async def post_role_buttons(interaction: discord.Interaction, channel: discord.T
 
 @client.tree.command(description="Send an announcement to a channel")
 async def announcement(interaction: discord.IntegrationAccount):
-    if not interaction.user.guild_permissions.administrator:
-        await interaction.response.send_message("You do not have the required permissions to use this command.",
-                                                ephemeral=True, delete_after=30)
-    return
+    # if not interaction.user.guild_permissions.administrator:
+    #     await interaction.response.send_message("You do not have the required permissions to use this command.",
+    #                                             ephemeral=True, delete_after=30)
+    # return
 
     announcement_modal = SendAnnouncementMessage()
     await interaction.response.send_modal(announcement_modal)
@@ -470,7 +477,7 @@ class SendAnnouncementMessage(discord.ui.Modal, title="Send an announcement to a
         style=discord.TextStyle.long,
         label="Message",
         required=True,
-        max_length=750,
+        max_length=1024,
         placeholder="Enter your message"
     )
 
@@ -489,18 +496,38 @@ class SendAnnouncementMessage(discord.ui.Modal, title="Send an announcement to a
         placeholder="Insert a channel ID"
     )
 
+    announcement_custom_color = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Custom Color",
+        required=False,
+        placeholder="Insert a hex color code (e.g. FF0000)",
+        min_length=6,
+        max_length=6
+    )
+
     async def on_submit(self, interaction: discord.Interaction):
         title = self.announcement_title.value
         message = self.announcement_message.value
         url = self.announcement_url.value
         channel_id = int(self.announcement_channel_id.value)
 
+        if self.announcement_custom_color.value:
+            if is_hex(self.announcement_custom_color.value):
+                color = discord.Color(int(self.announcement_custom_color.value, 16))
+            else:
+                await interaction.response.send_message("Invalid hex color value provided. Please provide a valid hex color code (e.g. FF0000).",
+                                                        ephemeral=True, delete_after=30)
+                return
+        else:
+            color = discord.Color.green()
+
+
         try:
             target_channel = client.get_channel(channel_id)
             if target_channel is not None:
                 if isinstance(target_channel, discord.TextChannel):
                     if target_channel.permissions_for(interaction.guild.me).send_messages:
-                        embed = discord.Embed(title=title, description=message)
+                        embed = discord.Embed(title=title, description=message, color=color)
 
                         if url and is_valid_image_url(url):
                             embed.set_image(url=url)
