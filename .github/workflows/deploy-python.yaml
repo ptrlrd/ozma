@@ -1,5 +1,4 @@
 name: Deploy Ozma via Docker Container
-
 on:
   push:
     branches:
@@ -22,13 +21,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8
 
-      - name: Run Flake8 with Reviewdog
-        uses: reviewdog/action-flake8@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-check
-          args: --config=setup.cfg
-          level: warning
+      - name: Run Flake8
+        run: flake8
 
   deploy:
     runs-on: self-hosted
