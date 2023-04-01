@@ -1,6 +1,7 @@
 # 1. Import necessary modules
 import os
 import json
+import re
 from typing import List
 
 import discord
@@ -13,7 +14,6 @@ import aiohttp
 # 2. Define constants
 load_dotenv()
 MY_GUILD = discord.Object(id=os.environ["guild_id"])
-print(MY_GUILD)
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -271,6 +271,11 @@ class ChannelsView(discord.ui.View):
 
 
 # 4. Define functions
+def is_valid_image_url(url: str) -> bool:
+    allowed_extensions = ('.jpg', '.jpeg', '.png', '.gif')
+    return url.lower().endswith(allowed_extensions)
+
+
 async def get_text_channels(guild: discord.Guild) -> List[discord.TextChannel]:
     return [channel for channel in guild.channels if isinstance(channel, discord.TextChannel)]
 
@@ -440,6 +445,85 @@ async def post_role_buttons(interaction: discord.Interaction, channel: discord.T
     except Exception as e:
         await interaction.response.send_message("An error occurred while looking up the character.")
         await send_error_message(interaction, e)
+
+
+@client.tree.command(description="Send an announcement to a channel")
+async def announcement(interaction: discord.IntegrationAccount):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message("You do not have the required permissions to use this command.",
+                                                ephemeral=True, delete_after=30)
+    return
+
+    announcement_modal = SendAnnouncementMessage()
+    await interaction.response.send_modal(announcement_modal)
+
+
+class SendAnnouncementMessage(discord.ui.Modal, title="Send an announcement to a channel"):
+    announcement_title = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Title",
+        required=True,
+        placeholder="Enter Title"
+    )
+
+    announcement_message = discord.ui.TextInput(
+        style=discord.TextStyle.long,
+        label="Message",
+        required=True,
+        max_length=750,
+        placeholder="Enter your message"
+    )
+
+    announcement_url = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Image",
+        required=False,
+        max_length=100,
+        placeholder="Insert a url with an image (should end with .jpg, .png, etc"
+    )
+
+    announcement_channel_id = discord.ui.TextInput(
+        style=discord.TextStyle.short,
+        label="Channel ID",
+        required=True,
+        placeholder="Insert a channel ID"
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        title = self.announcement_title.value
+        message = self.announcement_message.value
+        url = self.announcement_url.value
+        channel_id = int(self.announcement_channel_id.value)
+
+        try:
+            target_channel = client.get_channel(channel_id)
+            if target_channel is not None:
+                if isinstance(target_channel, discord.TextChannel):
+                    if target_channel.permissions_for(interaction.guild.me).send_messages:
+                        embed = discord.Embed(title=title, description=message)
+
+                        if url and is_valid_image_url(url):
+                            embed.set_image(url=url)
+
+                        await target_channel.send(embed=embed)
+                        await interaction.response.send_message("Announcement sent successfully!", ephemeral=True,
+                                                                delete_after=30)
+                    else:
+                        await interaction.response.send_message(
+                            "I do not have permission to send messages in the specified channel.", ephemeral=True,
+                            delete_after=30)
+                else:
+                    await interaction.response.send_message("The provided ID is not a Text Channel.", ephemeral=True,
+                                                            delete_after=30)
+            else:
+                await interaction.response.send_message("Invalid channel ID provided.", ephemeral=True, delete_after=30)
+        except Exception as e:
+            await interaction.response.send_message("An error occurred while sending the announcement.", ephemeral=True,
+                                                    delete_after=30)
+            await send_error_message(interaction, e)
+
+    async def on_error(self, interaction: discord.Interaction, error):
+        print(self, interaction, error)
 
 
 client.run(os.environ["token"])
