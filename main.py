@@ -79,7 +79,8 @@ class MyClient(discord.Client):
             with open(data_file, "r") as f:
                 message_id_store = json.load(f)
                 print(
-                    f"Loaded message_id_store: {message_id_store}")  # Add this line
+                    f"Loaded message_id_store: {message_id_store}")
+                    # Add this line
                 return message_id_store
         return {}
 
@@ -98,7 +99,8 @@ def save_message_ids(client):
     with open(data_file, "w") as f:
         json.dump(client.message_id_store, f)
         print(
-            f"Saved message_id_store: {client.message_id_store}")  # Add this line
+            f"Saved message_id_store: {client.message_id_store}")
+        # Add this line
 
 
 role_categories = {
@@ -166,7 +168,8 @@ class RoleButton(discord.ui.Button):
             if interaction.response.is_done():
                 return
 
-            # Fetch the updated member object for the user who clicked the button
+            # Fetch the updated member object for
+            # the user who clicked the button
             updated_member = await interaction.guild.fetch_member(
                 interaction.user.id)
 
@@ -340,7 +343,7 @@ async def get_text_channels(guild: discord.Guild) -> List[discord.TextChannel]:
 
 async def send_error_message(interaction: discord.Interaction, error):
     error_channel_id = os.environ["error_channel_id"]
-    error_channel = client.get_channel(error_channel_id)
+    #error_channel = client.get_channel(error_channel_id)
 
     print(error)
 
@@ -526,8 +529,8 @@ async def post_role_buttons(interaction: discord.Interaction,
                           "be a zero tolerance policy for breaking " \
                           "any of the server's rules, and if you are seen " \
                           "glorifying or joking about violence or " \
-                          "racism in any way, you may be immediately removed " \
-                          "from the FC/Discord. "
+                          "racism in any way, you may be immediately " \
+                          "removed from the FC/Discord."
                 view = ChannelsView(category_roles)
             # elif category == "Custom Color":
             #     message = "NITRO BOOSTER PERK! If you boost our server,
