@@ -87,7 +87,8 @@ role_categories = {
                   "Savage Raiding", "Extreme Trials Raiding", "Ultimate Raiding", "Unreal Raiding"],
     "Pronouns": ["He/him", "She/her", "They/them"],
     "Channel Access Roles": ["Tools Discussion", "Current Events"],
-    # "Custom Color": ["Orange Star", "Pink Star", "Purple Star", "Teal Star", "Green Star", "Yellow Star", "Black Star",
+    # "Custom Color": ["Orange Star", "Pink Star", "Purple Star", "Teal Star", "Green Star", "Yellow Star",
+    # "Black Star",
     #                  "White Star"]
 }
 
@@ -225,7 +226,8 @@ class ChannelsView(discord.ui.View):
 #             if booster_role in interaction.user.roles:
 #                 return True
 #             else:
-#                 await interaction.response.send_message(content="You must be a Nitro Booster to get one of these roles",
+#                 await interaction.response.send_message(content="You must be a Nitro Booster to get one of these
+#                 roles",
 #                                                         ephemeral=True, delete_after=30)
 #
 #                 return False
@@ -239,7 +241,9 @@ class ChannelsView(discord.ui.View):
 #         # Check if the user has the Nitro Booster role
 #         nitro_booster_role = discord.utils.get(interaction.guild.roles, name="Nitro Booster")
 #         if nitro_booster_role not in updated_member.roles:
-#             # Send an ephemeral message informing the user that they need to have the Nitro Booster role to get a custom color role
+#             # Send an ephemeral message informing the user that they need to have the Nitro Booster role to get a
+#             custom color role
+#
 #             await interaction.response.send_message("You must be a Nitro Booster to get one of these roles.",
 #                                                     ephemeral=True, delete_after=30)
 #             return
@@ -398,7 +402,8 @@ async def lookup_character(interaction: discord.Interaction, first_name: str, la
                 main_class_level = character_details["Character"]["ActiveClassJob"]["Level"]
 
                 embed = discord.Embed(title=character["Name"],
-                                      description=f"Server: {character['Server']}\nMain Class: {main_class} (Level {main_class_level})")
+                                      description=f"Server: {character['Server']}\nMain Class: {main_class} (Level "
+                                                  f"{main_class_level})")
                 embed.set_thumbnail(url=character["Avatar"])
                 await interaction.edit_original_response(embed=embed)
             else:
@@ -428,13 +433,21 @@ async def post_role_buttons(interaction: discord.Interaction, channel: discord.T
             category_roles = [role for role in guild.roles if role.name in role_names]
 
             if category == "XIV Roles":
-                message = "Please react to this message according to any roles that you would identify as. Keep in mind we may ping these roles to fill in groups and organize running content together. If you do not want to be pinged, you can mute that in the server settings."
+                message = "Please react to this message according to any roles that you would identify as. Keep in " \
+                          "mind we may ping these roles to fill in groups and organize running content together. If " \
+                          "you do not want to be pinged, you can mute that in the server settings. "
                 view = XIVRolesView(category_roles)
             elif category == "Pronouns":
-                message = "Please react to this message according to the pronoun that you wish to be called by. You can repeat this process to remove the role again."
+                message = "Please react to this message according to the pronoun that you wish to be called by. You " \
+                          "can repeat this process to remove the role again. "
                 view = PronounsView(category_roles)
             elif category == "Channel Access Roles":
-                message = "React to this role to gain access to a text channel for discussion of XIV tools (mods, plugins, ACT). \n\n The intent is this role reaction is to provide access to a channel called #current-events which is a space for people to discuss their feelings and thoughts about what’s going on outside Eorzea. There will be a zero tolerance policy for breaking any of the server's rules, and if you are seen glorifying or joking about violence or racism in any way, you may be immediately removed from the FC/Discord. "
+                message = "React to this role to gain access to a text channel for discussion of XIV tools (mods, " \
+                          "plugins, ACT). \n\n The intent is this role reaction is to provide access to a channel " \
+                          "called #current-events which is a space for people to discuss their feelings and thoughts " \
+                          "about what’s going on outside Eorzea. There will be a zero tolerance policy for breaking " \
+                          "any of the server's rules, and if you are seen glorifying or joking about violence or " \
+                          "racism in any way, you may be immediately removed from the FC/Discord. "
                 view = ChannelsView(category_roles)
             # elif category == "Custom Color":
             #     message = "NITRO BOOSTER PERK! If you boost our server, you can select a custom color for your name!"
@@ -515,7 +528,8 @@ class SendAnnouncementMessage(discord.ui.Modal, title="Send an announcement to a
             if is_hex(self.announcement_custom_color.value):
                 color = discord.Color(int(self.announcement_custom_color.value, 16))
             else:
-                await interaction.response.send_message("Invalid hex color value provided. Please provide a valid hex color code (e.g. FF0000).",
+                await interaction.response.send_message("Invalid hex color value provided. Please provide a valid hex "
+                                                        "color code (e.g. FF0000).",
                                                         ephemeral=True, delete_after=30)
                 return
         else:
