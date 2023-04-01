@@ -642,8 +642,8 @@ class SendAnnouncementMessage(discord.ui.Modal,
                             delete_after=30)
                     else:
                         await interaction.response.send_message(
-                            "I do not have permission to send messages in the "
-                            "specified channel.",
+                            "I do not have permission to send messages in "
+                            "the specified channel.",
                             ephemeral=True,
                             delete_after=30)
                 else:
