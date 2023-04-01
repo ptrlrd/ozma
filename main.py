@@ -80,7 +80,6 @@ class MyClient(discord.Client):
                 message_id_store = json.load(f)
                 print(
                     f"Loaded message_id_store: {message_id_store}")
-                        # Add this line
                 return message_id_store
         return {}
 
