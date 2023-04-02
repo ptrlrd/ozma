@@ -553,63 +553,74 @@ async def post_role_buttons(interaction: discord.Interaction,
 
 
 @client.tree.command(description="Send an announcement to a channel")
-async def announcement(interaction: discord.IntegrationAccount):
-    if not interaction.user.guild_permissions.administrator:
-        await interaction.response.send_message(
-            "You do not have the required permissions to use this command.",
-            ephemeral=True, delete_after=30)
-    return
+async def announcement(interaction: discord.IntegrationAccount, channel_id: int = None):
+    # if not interaction.user.guild_permissions.administrator:
+    #     await interaction.response.send_message(
+    #         "You do not have the required permissions to use this command.",
+    #         ephemeral=True, delete_after=30)
+    # return
 
-    announcement_modal = SendAnnouncementMessage()
+    announcement_modal = SendAnnouncementMessage(channel_id)
     await interaction.response.send_modal(announcement_modal)
-
 
 class SendAnnouncementMessage(discord.ui.Modal,
                               title="Send an announcement to a channel"):
-    announcement_title = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="Title",
-        required=True,
-        placeholder="Enter Title"
-    )
+    def __init__(self, channel_id=None):
+        super().__init__()
+        self.channel_id = channel_id
 
-    announcement_message = discord.ui.TextInput(
-        style=discord.TextStyle.long,
-        label="Message",
-        required=True,
-        max_length=1024,
-        placeholder="Enter your message"
-    )
+        self.announcement_title = discord.ui.TextInput(
+            style=discord.TextStyle.short,
+            label="Title",
+            required=True,
+            placeholder="Enter Title"
+        )
 
-    announcement_url = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="Image",
-        required=False,
-        max_length=100,
-        placeholder="Insert a url with an image (should end with .jpg, .png, "
-                    "etc"
-    )
+        self.announcement_message = discord.ui.TextInput(
+            style=discord.TextStyle.long,
+            label="Message",
+            required=True,
+            max_length=1024,
+            placeholder="Enter your message"
+        )
 
-    announcement_channel_id = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="Channel ID",
-        required=True,
-        placeholder="Insert a channel ID"
-    )
+        self.announcement_url = discord.ui.TextInput(
+            style=discord.TextStyle.short,
+            label="Image",
+            required=False,
+            max_length=100,
+            placeholder="Insert a url with an image (should end with .jpg, .png, etc."
+        )
 
-    announcement_custom_color = discord.ui.TextInput(
-        style=discord.TextStyle.short,
-        label="Custom Color",
-        required=False,
-        placeholder="Insert a hex color code (e.g. FF0000)",
-        min_length=6,
-        max_length=6
-    )
+        self.announcement_channel_id = discord.ui.TextInput(
+            style=discord.TextStyle.short,
+            label="Channel ID",
+            default=str(self.channel_id) if self.channel_id else None,
+            required=True,
+            placeholder="Insert a channel ID"
+        )
+
+        self.announcement_custom_color = discord.ui.TextInput(
+            style=discord.TextStyle.short,
+            label="Custom Color",
+            required=False,
+            placeholder="Insert a hex color code (e.g. FF0000)",
+            min_length=6,
+            max_length=6
+        )
+
+        self.add_item(self.announcement_title)
+        self.add_item(self.announcement_message)
+        self.add_item(self.announcement_url)
+        self.add_item(self.announcement_channel_id)
+        self.add_item(self.announcement_custom_color)
 
     async def on_submit(self, interaction: discord.Interaction):
         title = self.announcement_title.value
         message = self.announcement_message.value
         url = self.announcement_url.value
+
+        # Use the provided channel_id
         channel_id = int(self.announcement_channel_id.value)
 
         if self.announcement_custom_color.value:
