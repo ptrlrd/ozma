@@ -559,10 +559,9 @@ async def announcement(interaction: discord.IntegrationAccount,
         await interaction.response.send_message(
             "You do not have the required permissions to use this command.",
             ephemeral=True, delete_after=30)
-    return
-
-    announcement_modal = SendAnnouncementMessage(channel_name)
-    await interaction.response.send_modal(announcement_modal)
+    else:  # Add an 'else' block
+        announcement_modal = SendAnnouncementMessage(channel_name)
+        await interaction.response.send_modal(announcement_modal)
 
 
 class SendAnnouncementMessage(discord.ui.Modal,
