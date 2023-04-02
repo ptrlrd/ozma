@@ -564,6 +564,7 @@ async def announcement(interaction: discord.IntegrationAccount,
     announcement_modal = SendAnnouncementMessage(channel_name)
     await interaction.response.send_modal(announcement_modal)
 
+
 class SendAnnouncementMessage(discord.ui.Modal,
                               title="Send an announcement to a channel"):
     def __init__(self, channel_name=None):
