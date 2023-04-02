@@ -1,7 +1,7 @@
 # 1. Import necessary modules
 import json
 import os
-# import re
+import re
 from typing import List
 
 import aiohttp
@@ -553,21 +553,22 @@ async def post_role_buttons(interaction: discord.Interaction,
 
 
 @client.tree.command(description="Send an announcement to a channel")
-async def announcement(interaction: discord.IntegrationAccount, channel_id: int = None):
+async def announcement(interaction: discord.IntegrationAccount,
+                       channel_name: str = None):
     # if not interaction.user.guild_permissions.administrator:
     #     await interaction.response.send_message(
     #         "You do not have the required permissions to use this command.",
     #         ephemeral=True, delete_after=30)
     # return
 
-    announcement_modal = SendAnnouncementMessage(channel_id)
+    announcement_modal = SendAnnouncementMessage(channel_name)
     await interaction.response.send_modal(announcement_modal)
 
 class SendAnnouncementMessage(discord.ui.Modal,
                               title="Send an announcement to a channel"):
-    def __init__(self, channel_id=None):
+    def __init__(self, channel_name=None):
         super().__init__()
-        self.channel_id = channel_id
+        self.channel_name = channel_name
 
         self.announcement_title = discord.ui.TextInput(
             style=discord.TextStyle.short,
@@ -589,15 +590,16 @@ class SendAnnouncementMessage(discord.ui.Modal,
             label="Image",
             required=False,
             max_length=100,
-            placeholder="Insert a url with an image (should end with .jpg, .png, etc."
+            placeholder="Insert a url with an image (should end with .jpg, "
+                        ".png, etc."
         )
 
-        self.announcement_channel_id = discord.ui.TextInput(
+        self.announcement_channel_name = discord.ui.TextInput(
             style=discord.TextStyle.short,
-            label="Channel ID",
-            default=str(self.channel_id) if self.channel_id else None,
+            label="Channel Name",
+            default=self.channel_name if self.channel_name else None,
             required=True,
-            placeholder="Insert a channel ID"
+            placeholder="Insert a channel name"
         )
 
         self.announcement_custom_color = discord.ui.TextInput(
@@ -612,7 +614,7 @@ class SendAnnouncementMessage(discord.ui.Modal,
         self.add_item(self.announcement_title)
         self.add_item(self.announcement_message)
         self.add_item(self.announcement_url)
-        self.add_item(self.announcement_channel_id)
+        self.add_item(self.announcement_channel_name)
         self.add_item(self.announcement_custom_color)
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -620,8 +622,18 @@ class SendAnnouncementMessage(discord.ui.Modal,
         message = self.announcement_message.value
         url = self.announcement_url.value
 
-        # Use the provided channel_id
-        channel_id = int(self.announcement_channel_id.value)
+        # Use the provided channel_name
+        channel_name = self.announcement_channel_name.value
+        mention_pattern = re.compile(r'<#(\d+)>')
+
+        if mention_pattern.match(channel_name):
+            channel_id = int(mention_pattern.match(channel_name).group(1))
+            target_channel = discord.utils.get(
+                interaction.guild.text_channels, id=channel_id)
+            channel_name = target_channel.name
+        else:
+            target_channel = discord.utils.get(
+                interaction.guild.text_channels, name=channel_name)
 
         if self.announcement_custom_color.value:
             if is_hex(self.announcement_custom_color.value):
@@ -638,35 +650,30 @@ class SendAnnouncementMessage(discord.ui.Modal,
             color = discord.Color.green()
 
         try:
-            target_channel = client.get_channel(channel_id)
+            target_channel = discord.utils.get(
+                interaction.guild.text_channels, name=channel_name)
             if target_channel is not None:
-                if isinstance(target_channel, discord.TextChannel):
-                    if target_channel.permissions_for(
-                            interaction.guild.me).send_messages:
-                        embed = discord.Embed(title=title, description=message,
-                                              color=color)
+                if target_channel.permissions_for(
+                        interaction.guild.me).send_messages:
+                    embed = discord.Embed(title=title, description=message,
+                                          color=color)
 
-                        if url and is_valid_image_url(url):
-                            embed.set_image(url=url)
+                    if url and is_valid_image_url(url):
+                        embed.set_image(url=url)
 
-                        await target_channel.send(embed=embed)
-                        await interaction.response.send_message(
-                            "Announcement sent successfully!", ephemeral=True,
-                            delete_after=30)
-                    else:
-                        await interaction.response.send_message(
-                            "I do not have permission to send messages in "
-                            "the specified channel.",
-                            ephemeral=True,
-                            delete_after=30)
+                    await target_channel.send(embed=embed)
+                    await interaction.response.send_message(
+                        "Announcement sent successfully!", ephemeral=True,
+                        delete_after=30)
                 else:
                     await interaction.response.send_message(
-                        "The provided ID is not a Text Channel.",
+                        "I do not have permission to send messages in "
+                        "the specified channel.",
                         ephemeral=True,
                         delete_after=30)
             else:
                 await interaction.response.send_message(
-                    "Invalid channel ID provided.", ephemeral=True,
+                    "Invalid channel name provided.", ephemeral=True,
                     delete_after=30)
         except Exception as e:
             await interaction.response.send_message(
