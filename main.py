@@ -555,11 +555,11 @@ async def post_role_buttons(interaction: discord.Interaction,
 @client.tree.command(description="Send an announcement to a channel")
 async def announcement(interaction: discord.IntegrationAccount,
                        channel_name: str = None):
-    # if not interaction.user.guild_permissions.administrator:
-    #     await interaction.response.send_message(
-    #         "You do not have the required permissions to use this command.",
-    #         ephemeral=True, delete_after=30)
-    # return
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message(
+            "You do not have the required permissions to use this command.",
+            ephemeral=True, delete_after=30)
+    return
 
     announcement_modal = SendAnnouncementMessage(channel_name)
     await interaction.response.send_modal(announcement_modal)
