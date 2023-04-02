@@ -48,7 +48,7 @@ Here are some basic formatting options in Discord:
 - Code block: ` ``` language Code block: ``` `
 - Hyperlinking: `[Example](example.com)`
 
-### Continuous Integration and Deployment with GitHub Actions
+## Continuous Integration and Deployment with GitHub Actions
 
 This project uses a GitHub Actions workflow to automatically lint, build, and
 deploy the Ozma bot using Docker. The workflow is triggered on every push to
