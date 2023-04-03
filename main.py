@@ -518,18 +518,12 @@ async def post_role_buttons(interaction: discord.Interaction,
                           "can repeat this process to remove the role again. "
                 view = PronounsView(category_roles)
             elif category == "Channel Access Roles":
-                message = "React to this role to gain access to a text " \
-                          "channel for discussion of XIV tools (mods, " \
-                          "plugins, ACT). \n\n The intent is this role " \
-                          "reaction is to provide access to a channel " \
-                          "called #current-events which is a space for " \
-                          "people to discuss their feelings and thoughts " \
-                          "about what’s going on outside Eorzea. There will " \
-                          "be a zero tolerance policy for breaking " \
-                          "any of the server's rules, and if you are seen " \
-                          "glorifying or joking about violence or " \
-                          "racism in any way, you may be immediately " \
-                          "removed from the FC/Discord."
+                message = "XIV Tools Discussion: React to this role to gain access to a text channel for discussion " \
+                          "of XIV tools (mods, plugins, ACT).\n\nCurrent Events: Provides access to discuss folks' " \
+                          "feelings and thoughts about what’s going on outside Eorzea." \
+                          " There will be a zero tolerance " \
+                          "policy for breaking any of the server's rules, and if you are seen glorifying or joking " \
+                          "about violence or racism in any way, you may be immediately removed from the FC/Discord."
                 view = ChannelsView(category_roles)
             # elif category == "Custom Color":
             #     message = "NITRO BOOSTER PERK! If you boost our server,
@@ -678,6 +672,67 @@ class SendAnnouncementMessage(discord.ui.Modal,
         except Exception as e:
             await interaction.response.send_message(
                 "An error occurred while sending the announcement.",
+                ephemeral=True,
+                delete_after=30)
+            await send_error_message(interaction, e)
+
+    async def on_error(self, interaction: discord.Interaction, error):
+        print(self, interaction, error)
+
+
+@client.tree.command(description="Request an invitation")
+async def requestinvite(interaction: discord.Interaction):
+    request_invitation_modal = RequestInvitationModal()
+    await interaction.response.send_modal(request_invitation_modal)
+
+
+class RequestInvitationModal(discord.ui.Modal, title="Request an Invitation"):
+    def __init__(self):
+        super().__init__()
+
+        self.ffxiv_username = discord.ui.TextInput(
+            style=discord.TextStyle.short,
+            label="FFXIV Username",
+            required=True,
+            placeholder="Enter your FFXIV Username"
+        )
+
+        self.message = discord.ui.TextInput(
+            style=discord.TextStyle.long,
+            label="Message",
+            required=False,
+            max_length=1024,
+            placeholder="Enter your message"
+        )
+
+        self.add_item(self.ffxiv_username)
+        self.add_item(self.message)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        ffxiv_username = self.ffxiv_username.value
+        message = self.message.value
+
+        # Replace 'target_channel_id' with the actual ID of the target channel
+        target_channel_id = int(os.environ["invitation_channel"])
+        target_channel = interaction.guild.get_channel(target_channel_id)
+
+        try:
+            # Send the embed message
+            embed = discord.Embed(title="Invitation Request",
+                                  description=f"**FFXIV Username:** {ffxiv_username}\n**Message:** {message}",
+                                  color=discord.Color.green())
+            sent_message = await target_channel.send(content="@everyone", embed=embed)
+
+            # Add a checkmark reaction to the sent message
+            await sent_message.add_reaction("✅")
+
+            await interaction.response.send_message(
+                "Your invitation request has been sent!", ephemeral=True,
+                delete_after=30)
+
+        except Exception as e:
+            await interaction.response.send_message(
+                "Failed to send your request. Please try again later.",
                 ephemeral=True,
                 delete_after=30)
             await send_error_message(interaction, e)
