@@ -688,7 +688,7 @@ class SendAnnouncementMessage(discord.ui.Modal,
 
 @client.tree.command(description="Request an invitation")
 async def requestinvite(interaction: discord.Interaction):
-    request_invitation_modal = RequestInvitationModal(client)  # Pass the client instance
+    request_invitation_modal = RequestInvitationModal(client)
     await interaction.response.send_modal(request_invitation_modal)
 
 
