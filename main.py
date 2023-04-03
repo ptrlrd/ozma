@@ -688,13 +688,15 @@ class SendAnnouncementMessage(discord.ui.Modal,
 
 @client.tree.command(description="Request an invitation")
 async def requestinvite(interaction: discord.Interaction):
-    request_invitation_modal = RequestInvitationModal()
+    request_invitation_modal = RequestInvitationModal(client)  # Pass the client instance
     await interaction.response.send_modal(request_invitation_modal)
 
 
 class RequestInvitationModal(discord.ui.Modal, title="Request an Invitation"):
-    def __init__(self):
+    def __init__(self, client):  # Add the client parameter
         super().__init__()
+
+        self.client = client  # Save the client instance
 
         self.ffxiv_username = discord.ui.TextInput(
             style=discord.TextStyle.short,
@@ -718,9 +720,9 @@ class RequestInvitationModal(discord.ui.Modal, title="Request an Invitation"):
         ffxiv_username = self.ffxiv_username.value
         message = self.message.value
 
-        # Replace 'target_channel_id' with the actual ID of the target channel
         target_channel_id = int(os.environ["invitation_channel"])
-        target_channel = interaction.guild.get_channel(target_channel_id)
+        print(os.environ["invitation_channel"])
+        target_channel = self.client.get_channel(target_channel_id)
 
         try:
             # Send the embed message
