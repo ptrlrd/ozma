@@ -518,12 +518,18 @@ async def post_role_buttons(interaction: discord.Interaction,
                           "can repeat this process to remove the role again. "
                 view = PronounsView(category_roles)
             elif category == "Channel Access Roles":
-                message = "XIV Tools Discussion: React to this role to gain access to a text channel for discussion " \
-                          "of XIV tools (mods, plugins, ACT).\n\nCurrent Events: Provides access to discuss folks' " \
-                          "feelings and thoughts about what’s going on outside Eorzea." \
-                          " There will be a zero tolerance " \
-                          "policy for breaking any of the server's rules, and if you are seen glorifying or joking " \
-                          "about violence or racism in any way, you may be immediately removed from the FC/Discord."
+                message = "XIV Tools Discussion: React to this role to gain " \
+                          "access to a text channel for discussion of XIV " \
+                          "tools (mods, plugins, ACT).\n Current Events: " \
+                          "Provides access to discuss folks' feelings and " \
+                          "thoughts about what’s going on outside Eorzea. " \
+                          "There will be a zero tolerance policy for " \
+                          "breaking any of the server's rules, and if you " \
+                          "are seen glorifying or joking about violence or " \
+                          "racism in any way, you may be immediately " \
+                          "removed " \
+                          "from the FC/Discord."
+
                 view = ChannelsView(category_roles)
             # elif category == "Custom Color":
             #     message = "NITRO BOOSTER PERK! If you boost our server,
@@ -719,9 +725,12 @@ class RequestInvitationModal(discord.ui.Modal, title="Request an Invitation"):
         try:
             # Send the embed message
             embed = discord.Embed(title="Invitation Request",
-                                  description=f"**FFXIV Username:** {ffxiv_username}\n**Message:** {message}",
+                                  description=f'**FFXIV Username:**'
+                                              f' {ffxiv_username}\n'
+                                              f'**Message:** {message}',
                                   color=discord.Color.green())
-            sent_message = await target_channel.send(content="@everyone", embed=embed)
+            sent_message = await target_channel.send(content="@everyone",
+                                                     embed=embed)
 
             # Add a checkmark reaction to the sent message
             await sent_message.add_reaction("✅")
