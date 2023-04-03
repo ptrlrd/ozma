@@ -56,8 +56,8 @@ jobs:
       - name: Deploy with Docker Compose
         run: |
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
-          echo "token=${{ secrets.TOKEN }}" > .env
-          echo "invitation_channel=${{ secrets.INVITATION_CHANNEL }}" > .env
+          echo "token=${{ secrets.TOKEN }}" >> .env
+          echo "invitation_channel=${{ secrets.INVITATION_CHANNEL }}" >> .env
           echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
           echo "DOCKER_IMAGE_NAME=${{ secrets.DOCKER_IMAGE_NAME }}" >> .env
           echo "error_channel_id=${{ secrets.ERROR_CHANNEL_ID }}" >> .env
