@@ -87,8 +87,7 @@ include:
 ## Support
 
 If you encounter any issues or need help with Ozma, please feel free to reach
-out to us by sending an email to [ozma@ptrlrd.com](mailto:ozma@ptrlrd.com). We
-will do our best to assist you and address any concerns you may have.
+out to us by sending an email to [ozma@ptrlrd.com](mailto:ozma@ptrlrd.com) or join my [discord](https://discord.gg/aWdj37Edyq)
 
 ## License
 
